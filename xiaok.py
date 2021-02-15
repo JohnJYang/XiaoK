@@ -14,6 +14,7 @@ tokenizer = GPT2Tokenizer(
 
 gpt = hub.load('./cpm-lm-tf2_v2/')
 
+# len == 845
 text = f'''以下是一位老师和学生的对话。这位老师会根据学生不同的回答提出不同的问题，以此鼓励学生多交流，把心里想说的话都说出来。
 老师:同学早上好！你今天起床之后都做什么了呀？
 学生:我去帮我奶奶放了牛，然后再陪我姐姐一起去了超市。
@@ -42,8 +43,6 @@ text = f'''以下是一位老师和学生的对话。这位老师会根据学生
 老师:同学早上好！我们今天要聊些什么呀？
 学生:'''
 
-new_question = "老师:同学早上好！我们今天要聊些什么啊？"
-
 def create(tokenizer, gpt, prompt, number, length, top_p, temperature):
     inputs = tf.constant([tokenizer.encode(prompt)] * number, dtype=tf.int64)
     length = tf.constant(length, dtype=tf.int64)
@@ -58,9 +57,6 @@ def create(tokenizer, gpt, prompt, number, length, top_p, temperature):
 
 def ask_XiaoK(question, number, length, top_p, temperature):
     global new_question, text
-    if new_question:
-        print(new_question)
-        new_question = ''
     text += question
     ret = create(tokenizer, gpt, text, number, length, top_p, temperature)
     for x in ret:
@@ -74,16 +70,3 @@ def ask_XiaoK(question, number, length, top_p, temperature):
     text += show
     text += "\n学生:"
     return show
-
-
-while True:
-    if new_question:
-        print(new_question)
-        new_question = ''
-    question = input("学生:")
-    if question == 'quit' or question == 'exit':
-        break
-    elif question == 'text':
-        print(text)
-    else:
-        print(ask_XiaoK(question, 1, 50, 0.7, 1))
